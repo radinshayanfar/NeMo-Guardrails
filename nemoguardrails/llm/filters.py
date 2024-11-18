@@ -172,7 +172,7 @@ def to_messages(colang_history: str) -> List[dict]:
     return messages
 
 
-def to_user_messages_v2(colang_history: str) -> List[dict]:
+def to_user_messages_v2(colang_history: str) -> str:
     """Filter that given a history in colang 2.0 format, returns all messages with user role."""
     # messages = []
 
