@@ -972,6 +972,11 @@ class RailsConfig(BaseModel):
         description="Configuration for tracing.",
     )
 
+    evaluator: Optional[object] = Field(
+        default=None,
+        description="Evaluator class for paper, to inject desired behaviours in the runtime.",
+    )
+
     @root_validator(pre=True, allow_reuse=True)
     def check_prompt_exist_for_self_check_rails(cls, values):
         rails = values.get("rails", {})

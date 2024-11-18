@@ -123,12 +123,15 @@ class LLMTaskManager:
 
         template = self.env.from_string(template_str)
 
+        eval_history = self.config.evaluator.get_history() if self.config.evaluator is not None else ""
+
         # First, we extract all the variables from the template.
         variables = meta.find_undeclared_variables(self.env.parse(template_str))
 
         # This is the context that will be passed to the template when rendering.
         render_context = {
             "history": events,
+            "eval_history": eval_history,
             "general_instructions": self._get_general_instructions(),
             "sample_conversation": self.config.sample_conversation,
             "sample_conversation_two_turns": self.config.sample_conversation,

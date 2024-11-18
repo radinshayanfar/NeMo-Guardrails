@@ -178,6 +178,8 @@ def to_user_messages_v2(colang_history: str) -> str:
 
     # For now, we use a simple heuristic. The line `user "xxx"` gets translated to
     # a message from the user, and the rest gets translated to messages from the assistant.
+    if colang_history is None:
+        return ""
     lines = colang_history.split("\n")
     # print("=== lines", lines)
 
@@ -216,6 +218,9 @@ def to_user_messages_v2(colang_history: str) -> str:
     # messages = [{"type": "user", "content": output}]
 
     return output
+
+
+
 
 
 def to_messages_v2(colang_history: str) -> List[dict]:
