@@ -33,6 +33,7 @@ from nemoguardrails.llm.filters import (
     to_intent_messages_2,
     to_messages,
     to_messages_nemollm,
+    to_user_messages_v2,
     to_messages_v2,
     user_assistant_sequence,
     user_assistant_sequence_nemollm,
@@ -73,6 +74,7 @@ class LLMTaskManager:
             "user_assistant_sequence_nemollm"
         ] = user_assistant_sequence_nemollm
         self.env.filters["to_messages"] = to_messages
+        self.env.filters["to_user_messages_v2"] = to_user_messages_v2
         self.env.filters["to_messages_v2"] = to_messages_v2
         self.env.filters["to_intent_messages"] = to_intent_messages
         self.env.filters["to_intent_messages_2"] = to_intent_messages_2

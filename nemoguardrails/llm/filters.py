@@ -172,6 +172,52 @@ def to_messages(colang_history: str) -> List[dict]:
     return messages
 
 
+def to_user_messages_v2(colang_history: str) -> List[dict]:
+    """Filter that given a history in colang 2.0 format, returns all messages with user role."""
+    # messages = []
+
+    # For now, we use a simple heuristic. The line `user "xxx"` gets translated to
+    # a message from the user, and the rest gets translated to messages from the assistant.
+    lines = colang_history.split("\n")
+    # print("=== lines", lines)
+
+    output = ""
+
+    user_lines = []
+    bot_lines = []
+    for line in lines:
+        if line.startswith("user action:"):
+            if len(bot_lines) > 0:
+                # messages.append({"type": "assistant", "content": "\n".join(bot_lines)})
+                output += "== Bot:\n" + "\n".join(bot_lines) + "\n"
+                bot_lines = []
+            user_lines.append(line)
+        elif line.startswith("user intent:") or line.startswith("bot"):
+            if len(user_lines) > 0:
+                # messages.append({"type": "user", "content": "\n".join(user_lines)})
+                output += "== User:\n" + "\n".join(user_lines) + "\n"
+                user_lines = []
+            bot_lines.append(line)
+        elif line.strip() != "":
+            if len(user_lines) > 0:
+                user_lines.append(line)
+            elif len(bot_lines) > 0:
+                bot_lines.append(line)
+
+    if len(user_lines) > 0:
+        # messages.append({"type": "user", "content": "\n".join(user_lines)})
+        output += "== User:\n" + "\n".join(user_lines) + "\n"
+        user_lines = []
+    elif len(bot_lines) > 0:
+        # messages.append({"type": "assistant", "content": "\n".join(bot_lines)})
+        output += "== Bot:\n" + "\n".join(bot_lines) + "\n"
+        bot_lines = []
+
+    # messages = [{"type": "user", "content": output}]
+
+    return output
+
+
 def to_messages_v2(colang_history: str) -> List[dict]:
     """Filter that given a history in colang 2.0 format, returns all messages."""
     messages = []
