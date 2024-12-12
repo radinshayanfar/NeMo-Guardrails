@@ -777,6 +777,7 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
                 "context": state.context,
             },
         )
+        # print(prompt)
 
         stop = self.llm_task_manager.get_stop_tokens(
             Task.GENERATE_USER_INTENT_FROM_USER_ACTION
@@ -812,7 +813,10 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
         try:
             return literal_eval(value)
         except Exception:
-            raise Exception(f"Invalid LLM response: `{value}`")
+            try:
+                return literal_eval('"' + value + '"')
+            except Exception:
+                raise Exception(f"Invalid LLM response: `{value}`")
 
     @action(name="GenerateFlowAction", is_system_action=True, execute_async=True)
     async def generate_flow(
