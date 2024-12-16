@@ -33,8 +33,8 @@ from nemoguardrails.llm.filters import (
     to_intent_messages_2,
     to_messages,
     to_messages_nemollm,
-    to_user_messages_v2,
     to_messages_v2,
+    to_user_messages_v2,
     user_assistant_sequence,
     user_assistant_sequence_nemollm,
     verbose_v1,
@@ -123,7 +123,11 @@ class LLMTaskManager:
 
         template = self.env.from_string(template_str)
 
-        eval_history = self.config.evaluator.get_history() if self.config.evaluator is not None else ""
+        eval_history = (
+            self.config.evaluator.get_history()
+            if self.config.evaluator is not None
+            else ""
+        )
 
         # First, we extract all the variables from the template.
         variables = meta.find_undeclared_variables(self.env.parse(template_str))

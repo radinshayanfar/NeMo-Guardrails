@@ -220,9 +220,6 @@ def to_user_messages_v2(colang_history: str) -> str:
     return output
 
 
-
-
-
 def to_messages_v2(colang_history: str) -> List[dict]:
     """Filter that given a history in colang 2.0 format, returns all messages."""
     messages = []
