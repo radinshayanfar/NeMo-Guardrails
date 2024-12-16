@@ -810,6 +810,13 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
 
         log.info("Generated value for $%s: %s", var_name, value)
 
+        # first removing quotes if they are present
+        # then trying to evaluate the value
+        # if it fails, we add quotes and try again
+        if (value.startswith('"') and value.endswith('"')) or (
+            value.startswith("'") and value.endswith("'")
+        ):
+            value = value[1:-1]
         try:
             return literal_eval(value)
         except Exception:
