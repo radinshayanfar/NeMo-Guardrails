@@ -801,12 +801,16 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
             value = value[:-1]
 
         # Remove variable name from the left if it appears in the result:
-        if isinstance(prompt, str):
-            last_prompt_line = prompt.strip().split("\n")[-1]
-            value = value.replace(last_prompt_line, "").strip()
-        elif isinstance(prompt, list) and isinstance(prompt[-1]["content"], str):
-            last_prompt_line = prompt[-1]["content"].strip().split("\n")[-1]
-            value = value.replace(last_prompt_line, "").strip()
+        # if isinstance(prompt, str):
+        #     last_prompt_line = prompt.strip().split("\n")[-1]
+        #     value = value.replace(last_prompt_line, "").strip()
+        # elif isinstance(prompt, list) and isinstance(prompt[-1]["content"], str):
+        #     last_prompt_line = prompt[-1]["content"].strip().split("\n")[-1]
+        #     value = value.replace(last_prompt_line, "").strip()
+        if value.startswith(f"${var_name} = "):
+            value = value[len(f"${var_name} = ") :]
+        if value.startswith(f"{var_name} = "):
+            value = value[len(f"{var_name} = ") :]
 
         log.info("Generated value for $%s: %s", var_name, value)
 
