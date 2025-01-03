@@ -737,6 +737,7 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
         events: List[dict],
         var_name: Optional[str] = None,
         llm: Optional[BaseLLM] = None,
+        config: dict = None,
     ) -> Any:
         """Generate a value in the context of the conversation.
 
@@ -763,6 +764,10 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
                 if "GenerateValueAction" not in result.text:
                     examples += f"{result.text}\n\n"
 
+        task_info = None
+        if config.evaluator is not None:
+            task_info = config.evaluator.get_task_info()
+
         llm_call_info_var.set(
             LLMCallInfo(task=Task.GENERATE_VALUE_FROM_INSTRUCTION.value)
         )
@@ -775,6 +780,7 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
                 "instructions": instructions,
                 "var_name": var_name if var_name else "result",
                 "context": state.context,
+                "task_info": task_info,
             },
         )
         # print(prompt)
