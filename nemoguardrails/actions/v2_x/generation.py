@@ -789,17 +789,25 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
             Task.GENERATE_USER_INTENT_FROM_USER_ACTION
         )
 
-        with llm_params(llm, temperature=0.1):
-            result = await llm_call(llm, prompt, stop)
+        # retries in case of empty string
+        retries = 3
+        for attempt in range(retries):
+            with llm_params(llm, temperature=0.1):
+                result = await llm_call(llm, prompt, stop)
 
-        # Parse the output using the associated parser
-        result = self.llm_task_manager.parse_task_output(
-            Task.GENERATE_VALUE_FROM_INSTRUCTION, output=result
-        )
+            # Parse the output using the associated parser
+            result = self.llm_task_manager.parse_task_output(
+                Task.GENERATE_VALUE_FROM_INSTRUCTION, output=result
+            )
 
-        # We only use the first line for now
-        # TODO: support multi-line values?
-        value = result.strip().split("\n")[0]
+            # We only use the first line for now
+            # TODO: support multi-line values?
+            value = result.strip().split("\n")[0]
+
+            if value != "" or "deepseek" not in llm.model_name.lower():
+                break
+            print(f"WARNING - EMPTY LLM STRING - Attempt {attempt + 1}")
+            
 
         # Because of conventions from other languages, sometimes the LLM might add
         # a ";" at the end of the line. We remove that
@@ -820,6 +828,10 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
 
         log.info("Generated value for $%s: %s", var_name, value)
 
+        # returning None for empty string
+        if value == "":
+            print("WARNING - EMPTY LLM STRING")
+            return None
         # first removing quotes if they are present
         # then trying to evaluate the value
         # if it fails, we add quotes and try again
