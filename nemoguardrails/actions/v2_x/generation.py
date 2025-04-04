@@ -738,6 +738,7 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
         var_name: Optional[str] = None,
         llm: Optional[BaseLLM] = None,
         config: dict = None,
+        old_val: str = None,
     ) -> Any:
         """Generate a value in the context of the conversation.
 
@@ -781,6 +782,7 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
                 "var_name": var_name if var_name else "result",
                 "context": state.context,
                 "task_info": task_info,
+                "old_val": old_val if old_val else str(old_val),
             },
         )
         # print(prompt)
@@ -807,7 +809,7 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
             if value != "" or "deepseek" not in llm.model_name.lower():
                 break
             print(f"WARNING - EMPTY LLM STRING - Attempt {attempt + 1}")
-            
+
 
         # Because of conventions from other languages, sometimes the LLM might add
         # a ";" at the end of the line. We remove that
