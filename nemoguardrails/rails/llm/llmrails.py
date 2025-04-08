@@ -348,6 +348,7 @@ class LLMRails:
             if model_config.engine in [
                 "azure",
                 "openai",
+                "openrouter",
                 "gooseai",
                 "nlpcloud",
                 "petals",

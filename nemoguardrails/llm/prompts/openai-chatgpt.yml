@@ -4,6 +4,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: "{{ general_instructions }}"
@@ -30,6 +31,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: "{{ general_instructions }}"
@@ -47,6 +49,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: "{{ general_instructions }}"
@@ -73,6 +76,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: "{{ general_instructions }}"
@@ -108,6 +112,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: "{{ general_instructions }}"
@@ -142,6 +147,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: "{{ general_instructions }}"
@@ -169,6 +175,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: "{{ general_instructions }}"
@@ -206,6 +213,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: |
@@ -232,6 +240,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     content: |-
       # Example flows:
       {{ examples }}
@@ -245,6 +254,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: |
@@ -274,6 +284,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: "{{ general_instructions }}"
@@ -302,6 +313,7 @@ prompts:
     models:
       - openai/gpt-3.5-turbo
       - openai/gpt-4
+      - openrouter
     messages:
       - type: system
         content: |-
