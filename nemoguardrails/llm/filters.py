@@ -399,6 +399,12 @@ def last_turns(colang_history: str, n: int) -> str:
 
     return "\n".join(lines[i:])
 
+def remove_last(colang_history: str) -> str:
+    """Removes the last turn from a given colang history."""
+    lines = colang_history.split("\n")
+    lines = [line for line in lines if line != ""]
+    return "\n".join(lines[:-1])
+
 
 def indent(text: str, n_spaces: int) -> str:
     """Indents the provided text with the provided number of spaces."""

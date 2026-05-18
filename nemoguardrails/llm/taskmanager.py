@@ -27,6 +27,7 @@ from nemoguardrails.llm.filters import (
     first_turns,
     indent,
     last_turns,
+    remove_last,
     remove_text_messages,
     to_chat_messages,
     to_intent_messages,
@@ -68,6 +69,7 @@ class LLMTaskManager:
         self.env.filters["remove_text_messages"] = remove_text_messages
         self.env.filters["first_turns"] = first_turns
         self.env.filters["last_turns"] = last_turns
+        self.env.filters["remove_last"] = remove_last
         self.env.filters["indent"] = indent
         self.env.filters["user_assistant_sequence"] = user_assistant_sequence
         self.env.filters[

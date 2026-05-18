@@ -115,7 +115,8 @@ def encode_to_dict(obj: Any, refs: Dict[int, Any]):
         elif isinstance(obj, set):
             value = {"__type": "set", "value": [encode_to_dict(v, refs) for v in obj]}
         else:
-            raise Exception(f"Unhandled type in encode_to_dict: {type(obj)}")
+            # raise Exception(f"Unhandled type in encode_to_dict: {type(obj)}")
+            value = {"__type": "unknown", "value": "unknown"}
 
         refs[obj_id] = value
 

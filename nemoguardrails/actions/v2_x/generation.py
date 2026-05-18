@@ -294,13 +294,19 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
         )
 
         # We make this call with lowest temperature to have it as deterministic as possible.
-        with llm_params(llm, temperature=self.config.lowest_temperature):
+        with llm_params(llm, temperature=self.config.lowest_temperature, max_tokens=500):
             result = await llm_call(llm, prompt, stop=stop)
 
         # Parse the output using the associated parser
         result = self.llm_task_manager.parse_task_output(
             Task.GENERATE_USER_INTENT_FROM_USER_ACTION, output=result
         )
+
+        # mistral usually adds . at the end
+        if result.endswith("."):
+            result = result[:-1]
+
+        result = result.replace("`", "")
 
         user_intent = get_first_nonempty_line(result)
         # GTP-4o often adds 'user intent: ' in front
@@ -657,22 +663,31 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
             },
         )
 
-        # We make this call with temperature 0 to have it as deterministic as possible.
-        with llm_params(llm, temperature=temperature):
-            result = await llm_call(llm, prompt)
+        # Retry up to 3 times before returning LLM issue
+        for attempt in range(3):
+            # We make this call with temperature 0 to have it as deterministic as possible.
+            with llm_params(llm, temperature=temperature, max_tokens=500):
+                result = await llm_call(llm, prompt)
 
-        # TODO: Currently, we only support generating a bot action as continuation. This could be generalized
-        # Colang statements.
+            # TODO: Currently, we only support generating a bot action as continuation. This could be generalized
+            # Colang statements.
 
-        lines = _remove_leading_empty_lines(result).split("\n")
+            lines = _remove_leading_empty_lines(result).split("\n")
 
-        if len(lines) == 0 or (len(lines) == 1 and lines[0] == ""):
+            # Check if we got a valid response
+            if not (len(lines) == 0 or (len(lines) == 1 and lines[0] == "")):
+                break
+            
+            # Log warning for failed attempt
             response = "\n".join(lines)
             log.warning(
-                "GenerateFlowContinuationAction\nFAILING-PROMPT ::\n%s\n FAILING-RESPONSE: %s\n",
+                "GenerateFlowContinuationAction attempt %d failed\nFAILING-PROMPT ::\n%s\n FAILING-RESPONSE: %s\n",
+                attempt + 1,
                 prompt,
                 response,
             )
+        else:
+            # All retries failed, return LLM issue
             return {
                 "name": "bot inform LLM issue",
                 "body": 'flow bot inform LLM issue\n  bot say "Sorry! There was an issue in the LLM result form GenerateFlowContinuationAction!"',
@@ -683,6 +698,9 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
         if not bot_intent.startswith("bot "):
             bot_intent = get_first_bot_intent(result.splitlines())
         bot_action = get_first_bot_action(result.splitlines())
+
+        # add <LLM> to the beginning
+        bot_action = bot_action.replace("bot say \"", "bot say \"<LLM>", 1)
 
         if bot_action is None:
             raise LlmResponseError(f"Issue with LLM response: {result}")
@@ -924,20 +942,35 @@ class LLMGenerationActionsV2dotx(LLMGenerationActions):
             Task.GENERATE_FLOW_CONTINUATION_FROM_NLD
         )
 
-        with llm_params(llm, temperature=self.config.lowest_temperature):
-            result = await llm_call(llm, prompt, stop)
+        # Retry up to 3 times before returning LLM issue
+        for attempt in range(3):
+            with llm_params(llm, temperature=self.config.lowest_temperature):
+                result = await llm_call(llm, prompt, stop)
 
-        # Parse the output using the associated parser
-        result = self.llm_task_manager.parse_task_output(
-            Task.GENERATE_FLOW_CONTINUATION_FROM_NLD, output=result
-        )
+            # Parse the output using the associated parser
+            result = self.llm_task_manager.parse_task_output(
+                Task.GENERATE_FLOW_CONTINUATION_FROM_NLD, output=result
+            )
 
-        result = _remove_leading_empty_lines(result)
-        lines = result.split("\n")
-        if "codeblock" in lines[0]:
-            lines = lines[1:]
+            result = _remove_leading_empty_lines(result)
+            lines = result.split("\n")
+            if "codeblock" in lines[0]:
+                lines = lines[1:]
 
-        if len(lines) == 0 or (len(lines) == 1 and lines[0] == ""):
+            # Check if we got a valid response
+            if not (len(lines) == 0 or (len(lines) == 1 and lines[0] == "")):
+                break
+                
+            # Log warning for failed attempt
+            response = "\n".join(lines)
+            log.warning(
+                "GenerateFlowAction attempt %d failed\nFAILING-PROMPT ::\n%s\n FAILING-RESPONSE: %s\n",
+                attempt + 1,
+                prompt,
+                response,
+            )
+        else:
+            # All retries failed, return LLM issue
             return {
                 "name": "bot inform LLM issue",
                 "body": 'flow bot inform LLM issue\n  bot say "Sorry! There was an issue in the LLM result form GenerateFlowContinuationAction!"',
